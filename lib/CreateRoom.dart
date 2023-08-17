@@ -13,14 +13,25 @@ class CreateRoom extends StatefulWidget {
 }
 
 class _CreateRoom extends State {
+
+  // State variables.
   late String _title;
   late String _description;
   bool _private = false;
   double _maxPeople = 25;
+
+  // Key for form.
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  /// The build() method.
+  ///
+  /// @param  inContext The BuildContext for this widget.
+  /// @return           A Widget.
   @override
   Widget build(final BuildContext inContext) {
+
+    print("## CreateRoom.build()");
+
     return ScopedModel<FlutterChatModel>(
         model: model,
         child: ScopedModelDescendant<FlutterChatModel>(
@@ -36,23 +47,35 @@ class _CreateRoom extends State {
                   TextButton(
                       child: Text("Cancel"),
                       onPressed: () {
+                        // Hide soft keyboard.
                         FocusScope.of(inContext).requestFocus(FocusNode());
+                        // Navigate back from this screen.
                         Navigator.of(inContext).pop();
                       }),
                   Spacer(),
                   TextButton(
                       child: Text("Save"),
                       onPressed: () {
+                        // Abort if form isn't valid.
                         if (!_formKey.currentState!.validate()) {
                           return;
                         }
+                        // Save all the values.
                         _formKey.currentState!.save();
+                        // Need to truncate maxPeople so we just have an integer.
                         int maxPeople = _maxPeople.truncate();
+                        print("_title=$_title, _description = $_description, _maxPeople = $maxPeople, "
+                            "_private = $_private, creator = $model.userName"
+                        );
                         connector.create(_title, _description, maxPeople,
                             _private, model.userName, (inStatus, inRoomList) {
+                          print("## CreateRoom.create: callback: inStatus=$inStatus, inRoomList=$inRoomList");
                           if (inStatus == "created") {
+                            // Update the model with the new list of rooms.
                             model.setRoomList(inRoomList);
+                            // Hide soft keyboard.
                             FocusScope.of(inContext).requestFocus(FocusNode());
+                            // Navigate back from this screen.
                             Navigator.of(inContext).pop();
                           } else {
                             ScaffoldMessenger.of(inContext).showSnackBar(
@@ -69,6 +92,7 @@ class _CreateRoom extends State {
               body: Form(
                   key: _formKey,
                   child: ListView(children: [
+                    // Name.
                     ListTile(
                       leading: Icon(Icons.subject),
                       title: TextFormField(
@@ -87,6 +111,7 @@ class _CreateRoom extends State {
                         },
                       ),
                     ),
+                    // Description.
                     ListTile(
                       leading: Icon(Icons.description),
                       title: TextFormField(
@@ -98,6 +123,7 @@ class _CreateRoom extends State {
                         },
                       ),
                     ),
+                    // Max People.
                     ListTile(
                         title: Row(children: [
                           Text("Max\nPeople"),
@@ -112,6 +138,7 @@ class _CreateRoom extends State {
                               })
                         ]),
                         trailing: Text(_maxPeople.toStringAsFixed(0))),
+                    // Private?
                     ListTile(
                         title: Row(children: [
                       Text("Private"),
