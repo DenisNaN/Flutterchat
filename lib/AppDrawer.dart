@@ -5,14 +5,21 @@ import 'package:scoped_model/scoped_model.dart';
 import 'Connector.dart' as connector;
 
 class AppDrawer extends StatelessWidget {
+
+  /// The build() method.
+  ///
+  /// @param  inContext The BuildContext for this widget.
+  /// @return           A Widget.
   @override
   Widget build(final BuildContext inContext) {
+    print("## AppDrawer.build()");
     return ScopedModel<FlutterChatModel>(
         model: model,
         child: ScopedModelDescendant<FlutterChatModel>(
             builder: (inContext, Widget? inChild, FlutterChatModel inModel) {
           return Drawer(
               child: Column(children: [
+                // Header.
             Container(
               decoration: BoxDecoration(
                   image: DecorationImage(
@@ -33,6 +40,7 @@ class AppDrawer extends StatelessWidget {
                                 TextStyle(color: Colors.white, fontSize: 16)))),
               ),
             ),
+                // Lobby (room list).
             Padding(
                 padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
                 child: ListTile(
@@ -42,25 +50,33 @@ class AppDrawer extends StatelessWidget {
                       Navigator.of(inContext).pushNamedAndRemoveUntil(
                           "/Lobby", ModalRoute.withName("/"));
                       connector.listRooms((inRoomList) {
+                        print("## AppDrawer.listRooms: callback: inRoomList=$inRoomList");
                         model.setRoomList(inRoomList);
                       });
                     })),
+                // Current Room.
             ListTile(
               enabled: model.currentRoomEnabled,
               leading: Icon(Icons.forum),
               title: Text("Current Room"),
               onTap: () {
+                // Navigate to new screen, ensuring all others except Home are removed from navigation.
                 Navigator.of(inContext).pushNamedAndRemoveUntil(
                     "/Room", ModalRoute.withName("/"));
               },
             ),
+                // User List.
             ListTile(
               leading: Icon(Icons.face),
               title: Text("User List"),
               onTap: () {
+                // Navigate to new screen, ensuring all others except Home are removed from navigation.
                 Navigator.of(inContext).pushNamedAndRemoveUntil(
                     "/UserList", ModalRoute.withName("/"));
+                // Call server to get user list.
                 connector.listUsers((inUserList) {
+                  print("## AppDrawer.listUsers: callback: inUserList=$inUserList");
+                  // Update the model with the new list of users.
                   model.setUserList(inUserList);
                 });
               }
