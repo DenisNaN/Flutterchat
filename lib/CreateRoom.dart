@@ -13,7 +13,6 @@ class CreateRoom extends StatefulWidget {
 }
 
 class _CreateRoom extends State {
-
   // State variables.
   late String _title;
   late String _description;
@@ -29,13 +28,11 @@ class _CreateRoom extends State {
   /// @return           A Widget.
   @override
   Widget build(final BuildContext inContext) {
-
     print("## CreateRoom.build()");
 
     return ScopedModel<FlutterChatModel>(
         model: model,
-        child: ScopedModelDescendant<FlutterChatModel>(
-            builder: (inContext, Widget? inChild, FlutterChatModel inModel) {
+        child: ScopedModelDescendant<FlutterChatModel>(builder: (inContext, Widget? inChild, FlutterChatModel inModel) {
           return Scaffold(
               resizeToAvoidBottomInset: false,
               appBar: AppBar(title: Text("Create Room")),
@@ -65,10 +62,8 @@ class _CreateRoom extends State {
                         // Need to truncate maxPeople so we just have an integer.
                         int maxPeople = _maxPeople.truncate();
                         print("_title=$_title, _description = $_description, _maxPeople = $maxPeople, "
-                            "_private = $_private, creator = $model.userName"
-                        );
-                        connector.create(_title, _description, maxPeople,
-                            _private, model.userName, (inStatus, inRoomList) {
+                            "_private = $_private, creator = $model.userName");
+                        connector.create(_title, _description, maxPeople, _private, model.userName, (inStatus, inRoomList) {
                           print("## CreateRoom.create: callback: inStatus=$inStatus, inRoomList=$inRoomList");
                           if (inStatus == "created") {
                             // Update the model with the new list of rooms.
@@ -78,12 +73,10 @@ class _CreateRoom extends State {
                             // Navigate back from this screen.
                             Navigator.of(inContext).pop();
                           } else {
-                            ScaffoldMessenger.of(inContext).showSnackBar(
-                                SnackBar(
-                                    backgroundColor: Colors.red,
-                                    duration: Duration(seconds: 2),
-                                    content: Text(
-                                        "Sorry, that room already exists")));
+                            ScaffoldMessenger.of(inContext).showSnackBar(SnackBar(
+                                backgroundColor: Colors.red,
+                                duration: Duration(seconds: 2),
+                                content: Text("Sorry, that room already exists")));
                           }
                         });
                       })

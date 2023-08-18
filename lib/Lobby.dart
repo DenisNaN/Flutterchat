@@ -6,14 +6,12 @@ import 'AppDrawer.dart';
 import 'Connector.dart' as connector;
 
 class Lobby extends StatelessWidget {
-
   /// The build() method.
   ///
   /// @param  inContext The BuildContext for this widget.
   /// @return           A Widget.
   @override
   Widget build(final BuildContext inContext) {
-
     print("## Lobby.build()");
 
     return ScopedModel<FlutterChatModel>(
@@ -30,8 +28,7 @@ class Lobby extends StatelessWidget {
                     Navigator.pushNamed(inContext, "/CreateRoom");
                   }),
               body: model.roomList.length == 0
-                  ? Center(
-                      child: Text("There are no rooms yet. Why not add one?"))
+                  ? Center(child: Text("There are no rooms yet. Why not add one?"))
                   : ListView.builder(
                       itemCount: model.roomList.length,
                       itemBuilder: (BuildContext inBuildContext, int inIndex) {
@@ -39,40 +36,31 @@ class Lobby extends StatelessWidget {
                         String roomName = room["roomName"];
                         return Column(children: [
                           ListTile(
-                              leading: room["private"]
-                                  ? Image.asset("assets/private.png")
-                                  : Image.asset("assets/public.png"),
+                              leading: room["private"] ? Image.asset("assets/private.png") : Image.asset("assets/public.png"),
                               title: Text(roomName),
                               subtitle: Text(room["description"]),
                               // Enter room (if not private).
                               onTap: () {
                                 // If the room is private and the user doesn't have an invite and they aren't the user that
                                 // created the room, then they can't get in.
-                                if (room["private"] &&
-                                    !model.roomInvites.containsKey(roomName) &&
-                                    room["creator"] != model.userName) {
-                                  ScaffoldMessenger.of(inBuildContext)
-                                      .showSnackBar(SnackBar(
-                                          backgroundColor: Colors.red,
-                                          duration: Duration(seconds: 2),
-                                          content: Text("Sorry, you can`t "
-                                              "enter a private room without an invite")));
+                                if (room["private"] && !model.roomInvites.containsKey(roomName) && room["creator"] != model.userName) {
+                                  ScaffoldMessenger.of(inBuildContext).showSnackBar(SnackBar(
+                                      backgroundColor: Colors.red,
+                                      duration: Duration(seconds: 2),
+                                      content: Text("Sorry, you can`t "
+                                          "enter a private room without an invite")));
                                 } else {
-                                  connector.join(model.userName, roomName,
-                                      (inStatus, inRoomDescriptor) {
+                                  connector.join(model.userName, roomName, (inStatus, inRoomDescriptor) {
                                     print("## Lobby.joined callback: inStatus = $inStatus, inRoomDescriptor = $inRoomDescriptor");
                                     if (inStatus == "joined") {
                                       // Store the room name and the list of users in the room in the model and enable
                                       // the Current Room drawer option.
-                                      model.setCurrentRoomName(
-                                          inRoomDescriptor["roomName"]);
-                                      model.setCurrentRoomUserList(
-                                          inRoomDescriptor["users"]);
+                                      model.setCurrentRoomName(inRoomDescriptor["roomName"]);
+                                      model.setCurrentRoomUserList(inRoomDescriptor["users"]);
                                       model.setCurrentRoomEnabled(true);
                                       model.clearCurrentRoomMessage();
                                       // Enable the two creator functions if this is the user that created the room.
-                                      if (inRoomDescriptor["creator"] ==
-                                          model.userName) {
+                                      if (inRoomDescriptor["creator"] == model.userName) {
                                         model.setCreatorFunctiondEnabled(true);
                                       } else {
                                         model.setCreatorFunctiondEnabled(false);
@@ -80,12 +68,10 @@ class Lobby extends StatelessWidget {
                                       // Navigate to the room screen.
                                       Navigator.pushNamed(inContext, "/Room");
                                     } else if (inStatus == "full") {
-                                      ScaffoldMessenger.of(inBuildContext)
-                                          .showSnackBar(SnackBar(
-                                              backgroundColor: Colors.red,
-                                              duration: Duration(seconds: 2),
-                                              content: Text(
-                                                  "Sorry, that room is full")));
+                                      ScaffoldMessenger.of(inBuildContext).showSnackBar(SnackBar(
+                                          backgroundColor: Colors.red,
+                                          duration: Duration(seconds: 2),
+                                          content: Text("Sorry, that room is full")));
                                     }
                                   });
                                 }
